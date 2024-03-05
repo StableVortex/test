@@ -1,24 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import UsersListPage from "./pages/UsersListPage";
+import AddUserPage from "./pages/AddUser";
+import { AuthProvider } from "./hooks/AuthContext";
+
+import { QueryClient, QueryClientProvider } from "react-query";
+import EditUserPage from "./pages/EditUser";
+
+const queryClient = new QueryClient();
 
 function App() {
+  const token = sessionStorage.getItem("token");
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<LoginPage />} />
+            <Route
+              path="/users"
+              element={token ? <UsersListPage /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/add"
+              element={token ? <AddUserPage /> : <Navigate to="/" />}
+            />
+            <Route
+              path="/edit/:id"
+              element={token ? <EditUserPage /> : <Navigate to="/" />}
+            />
+          </Routes>
+        </Router>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 
